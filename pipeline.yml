@@ -1,3 +1,10 @@
+resource_types:
+  - name: cappyzawa-cf    
+    type: registry-image
+    source:
+      repository: cappyzawa/cf-resource    
+      tag: 6.28.0
+
 resources:
 - name: repo
   type: git
@@ -19,6 +26,7 @@ resources:
     api: ((cf-api))
     username: ((cf-username))
     password: ((cf-password))
+    org: ((cf-org))
     space: ((cf-space))
     skip_cert_check: true
 
@@ -37,17 +45,17 @@ jobs:
       platform: linux
       image_resource: {type: docker-image, source: {repository: alpine}}
       inputs: [{name: repo}]
-      ouputs: [{name: out}]
+      outputs: [{name: out}]
       params:
         DOMAIN: ((domain))
       run:
         path: sh
         args:
-        - c
+        - -c
         - |
           sed -e "s/<FIX_ME>/${DOMAIN}/g" repo/manifest.yml > out/manifest.yml
   - put: cf
-    parmas:
+    params:
       manifest: out/manifest.yml
       # overwrite "path" in manifest
       path: gh-release/imakarahajimeru
