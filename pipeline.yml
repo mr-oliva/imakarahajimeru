@@ -1,8 +1,8 @@
 resource_types:
-  - name: cappyzawa-cf    
+  - name: cappyzawa-cf
     type: registry-image
     source:
-      repository: cappyzawa/cf-resource    
+      repository: cappyzawa/cf-resource
       tag: 6.28.0
 
 resources:
@@ -35,7 +35,7 @@ resources:
 jobs:
 - name: tag
   plan:
-  - aggregate:
+  - in_parallel:
     - get: repo
       trigger: true
     - get: gh-release
@@ -46,8 +46,10 @@ jobs:
     config:
       platform: linux
       image_resource: {type: docker-image, source: {repository: alpine}}
-      inputs: [{name: repo}]
-      outputs: [{name: out}]
+      inputs:
+      - name: repo
+      outputs:
+      - name: out
       params:
         DOMAIN: ((domain))
       run:
