@@ -5,7 +5,7 @@ applications:
   buildpack: binary_buildpack
   routes:
   - route: imakara.<<FIX_ME>>
-  command: imakarahajimeru
+  command: ./imakarahajimeru
   env:
     TZ: Asia/Tokyo
     LANG: ja_JP.UTF-8
