@@ -25,12 +25,29 @@ resources:
 jobs:
 - name: tag
   plan:
-  - get: repo
-    trigger: true
-  - get: gh-release
-    params:
-      globs: 
-      - imakarahajimeru
-        #- put: cf
-        #  params:
-        #    manifest: 
+  - aggregate:
+    - get: repo
+      trigger: true
+    - get: gh-release
+      params:
+        globs:
+        - imakarahajimeru
+  - task: set-domain
+    config:
+      platform: linux
+      image_resource: {type: docker-image, source: {repository: alpine}}
+      inputs: [{name: repo}]
+      ouputs: [{name: out}]
+      params:
+        DOMAIN: ((domain))
+      run:
+        path: sh
+        args:
+        - c
+        - |
+          sed -e "s/<FIX_ME>/${DOMAIN}/g" repo/manifest.yml > out/manifest.yml
+  - put: cf
+    parmas:
+      manifest: out/manifest.yml
+      # overwrite "path" in manifest
+      path: gh-release/imakarahajimeru

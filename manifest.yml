@@ -1,0 +1,11 @@
+---
+applications:
+- name: imakara
+  instances: 1
+  buildpack: binary_buildpack
+  host: imakara
+  domain: <<FIX_ME>>
+  command: imakarahajimeru
+  env:
+    TZ: Asia/Tokyo
+    LANG: ja_JP.UTF-8
