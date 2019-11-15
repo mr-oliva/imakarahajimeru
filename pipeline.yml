@@ -32,6 +32,17 @@ resources:
     space: ((cf-space))
     skip_cert_check: true
 
+- name: version
+  type: semver
+  source:
+    uri: https://github.com/bookun/imakarahajimeru
+    driver: git
+    branch: mastei
+    file: imakarahajimeru
+    username: bookun
+    password: ((password))
+
+
 jobs:
 - name: tag
   plan:
@@ -63,3 +74,13 @@ jobs:
       manifest: out/manifest.yml
       # overwrite "path" in manifest
       path: gh-release
+
+- name: version
+  plan:
+  - get: version
+    params: {bump: minor}
+  - task: build
+    file: build.yml
+  - put: version
+    params: {file: imakarahajimeru}
+
