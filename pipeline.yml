@@ -12,8 +12,25 @@ resources:
     owner: bookun
     repository: imakarahajimeru
 
+- name: cf
+  type: cappyzawa-cf
+  icon: cloud
+  source:
+    api: ((cf-api))
+    username: ((cf-username))
+    password: ((cf-password))
+    space: ((cf-space))
+    skip_cert_check: true
+
 jobs:
 - name: tag
   plan:
-  - get: gh-release
+  - get: repo
     trigger: true
+  - get: gh-release
+    params:
+      globs: 
+      - imakarahajimeru
+        #- put: cf
+        #  params:
+        #    manifest: 
