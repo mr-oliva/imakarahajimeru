@@ -3,8 +3,8 @@ applications:
 - name: imakara
   instances: 1
   buildpack: binary_buildpack
-  host: imakara
-  domain: <<FIX_ME>>
+  routes:
+  - route: imakara.<<FIX_ME>>
   command: imakarahajimeru
   env:
     TZ: Asia/Tokyo
