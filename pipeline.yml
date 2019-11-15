@@ -18,6 +18,8 @@ resources:
   source:
     owner: bookun
     repository: imakarahajimeru
+    access_token: ((github-access-token))
+    tag_filter: v*.*.*
 
 - name: cf
   type: cappyzawa-cf
@@ -53,9 +55,9 @@ jobs:
         args:
         - -c
         - |
-          sed -e "s/<FIX_ME>/${DOMAIN}/g" repo/manifest.yml > out/manifest.yml
+          sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest.yml > out/manifest.yml
   - put: cf
     params:
       manifest: out/manifest.yml
       # overwrite "path" in manifest
-      path: gh-release/imakarahajimeru
+      path: gh-release
