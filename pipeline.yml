@@ -1,0 +1,19 @@
+resources:
+- name: repo
+  type: git
+  icon: github-circle
+  #webhook_token: ((webhook-token))
+  source:
+    uri: https://github.com/bookun/imakarahajimeru
+
+- name: gh-release
+  type: github-release
+  source:
+    owner: bookun
+    repository: imakarahajimeru
+
+jobs:
+- name: tag
+  plan:
+  - get: gh-release
+    trigger: true
