@@ -38,7 +38,7 @@ resources:
     uri: https://github.com/bookun/imakarahajimeru
     driver: git
     branch: master
-    file: imakarahajimeru
+    file: version
     username: bookun
     password: ((password))
 
