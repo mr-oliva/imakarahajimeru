@@ -1,9 +1,9 @@
-resource_types:
-- name: cappyzawa-cf
-  type: registry-image
-  source:
-    repository: cappyzawa/cf-resource
-    tag: 6.28.0
+#resource_types:
+#- name: cappyzawa-cf
+#  type: registry-image
+#  source:
+#    repository: cappyzawa/cf-resource
+#    tag: 6.28.0
 
 resources:
 - name: repo
@@ -12,6 +12,9 @@ resources:
   #webhook_token: ((webhook-token))
   source:
     uri: https://github.com/bookun/imakarahajimeru
+    username: bookun
+    password: ((password))
+
 
 - name: gh-release
   type: github-release
@@ -22,16 +25,16 @@ resources:
     access_token: ((github-access-token))
     tag_filter: v*.*.*
 
-- name: cf
-  type: cappyzawa-cf
-  icon: cloud
-  source:
-    api: ((cf-api))
-    username: ((cf-username))
-    password: ((cf-password))
-    organization: ((cf-org))
-    space: ((cf-space))
-    skip_cert_check: true
+    #- name: cf
+    #  type: cappyzawa-cf
+    #  icon: cloud
+    #  source:
+    #    api: ((cf-api))
+    #    username: ((cf-username))
+    #    password: ((cf-password))
+    #    organization: ((cf-org))
+    #    space: ((cf-space))
+    #    skip_cert_check: true
 
 - name: version
   type: semver
@@ -45,43 +48,73 @@ resources:
     password: ((password))
     commit_message: "[ci skip] bump to %version%"
 
+- name: s3
+  type: s3
+  source:
+    bucket: ((s3-bucket))
+    access_key_id: ((s3-access))
+    secret_access_key: ((s3-secret))
+    region_name: ap-northeast-1
+
 
 jobs:
+- name: s3-upload
+  plan:
+  - get: repo
+  - task: build
+    file: repo/build.yml
+  - put: s3
+    params:
+      file: repo/manifest.yml
+  - put: s3
+    params:
+      file: binary/imakarahajimeru
+
 - name: deploy
   plan:
-  - in_parallel:
-    - get: repo
-      # trigger: true
-    - get: gh-release
-      params:
-        globs:
-        - imakarahajimeru
-  - task: set-domain
-    config:
-      platform: linux
-      image_resource: {type: docker-image, source: {repository: alpine}}
-      inputs:
-      - name: repo
-      outputs:
-      - name: out
-      params:
-        DOMAIN: ((domain))
-      run:
-        path: sh
-        args:
-        - -c
-        - |
-          sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest.yml > out/manifest.yml
-  - put: cf
+    #- get: gh-release
+    #  params:
+    #    globs:
+    #    - imakarahajimeru
+    #    - manifest.yml
+  - get: repo
+    #filename: imakarahajimeru
+    #- task: set-domain
+    #  config:
+    #    platform: linux
+    #    image_resource: {type: docker-image, source: {repository: alpine}}
+    #    inputs:
+    #    - name: repo
+    #    outputs:
+    #    - name: out
+    #    params:
+    #      DOMAIN: ((domain))
+    #    run:
+    #      path: sh
+    #      args:
+    #      - -c
+    #      - |
+    #        sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest.yml > out/manifest.yml
+    #- task: build
+    #  file: repo/build.yml
+    #- put: cf
+    #  params:
+    #    manifest: out/manifest.yml
+    #    # overwrite "path" in manifest
+    #    path: binary
+  - put: version
     params:
-      manifest: out/manifest.yml
-      # overwrite "path" in manifest
-      path: gh-release
+      bump: minor
+  - put: repo
+    params:
+      repository: bookun/imakarahajimeru
+      tag: version/version
+      only_tag: true
+      tag_prefix: v
 
 - name: version
   plan:
   - get: repo
-    trigger: true
   - task: build
     file: repo/build.yml
   - put: version
@@ -94,3 +127,4 @@ jobs:
       tag_prefix: v
       globs:
       - binary/imakarahajimeru
+      - repo/manifest.yml
