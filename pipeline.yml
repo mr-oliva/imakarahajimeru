@@ -1,9 +1,9 @@
 resource_types:
-  - name: cappyzawa-cf
-    type: registry-image
-    source:
-      repository: cappyzawa/cf-resource
-      tag: 6.28.0
+- name: cappyzawa-cf
+  type: registry-image
+  source:
+    repository: cappyzawa/cf-resource
+    tag: 6.28.0
 
 resources:
 - name: repo
@@ -15,6 +15,7 @@ resources:
 
 - name: gh-release
   type: github-release
+  icon: package-variant-closed
   source:
     owner: bookun
     repository: imakarahajimeru
@@ -34,6 +35,7 @@ resources:
 
 - name: version
   type: semver
+  icon: tag
   source:
     uri: https://github.com/bookun/imakarahajimeru
     driver: git
@@ -41,14 +43,15 @@ resources:
     file: version
     username: bookun
     password: ((password))
+    commit_message: "[ci skip] bump to %version%"
 
 
 jobs:
-- name: tag
+- name: deploy
   plan:
   - in_parallel:
     - get: repo
-      #trigger: true
+      # trigger: true
     - get: gh-release
       params:
         globs:
@@ -77,12 +80,13 @@ jobs:
 
 - name: version
   plan:
-  - in_parallel:
-    - get: repo
-    - get: version
-      params: {bump: minor}
+  - get: repo
+    trigger: true
   - task: build
     file: repo/build.yml
+  - put: version
+    params:
+      bump: minor
   - put: gh-release
     params:
       name: version/version
@@ -90,4 +94,3 @@ jobs:
       tag_prefix: v
       globs:
       - binary/imakarahajimeru
-  - put: version
