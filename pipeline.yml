@@ -84,4 +84,4 @@ jobs:
   - task: build
     file: repo/build.yml
   - put: version
-    params: {file: imakarahajimeru}
+    params: {file: repo/imakarahajimeru}

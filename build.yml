@@ -9,7 +9,7 @@ image_resource:
 inputs:
   - name: repo
 outputs:
-  - name: repo
+  - name: imakarahajimeru
 
 run:
   dir: repo
