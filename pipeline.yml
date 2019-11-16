@@ -156,13 +156,13 @@ jobs:
 
 - name: proMOCK-deploy
   plan:
-  - get: gh-release
+  - get: gh-pre-release
   - task: set-domain
     config:
       platform: linux
       image_resource: {type: docker-image, source: {repository: alpine}}
       inputs:
-      - name: gh-release
+      - name: gh-pre-release
       outputs:
       - name: out
       params:
@@ -172,16 +172,16 @@ jobs:
         args:
         - -c
         - |
-          sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest-pro-mock.yml > out/manifest-pro-mock.yml
+          sed -e "s/<<FIX_ME>>/${DOMAIN}/g" gh-pre-release/manifest-pro-mock.yml > out/manifest-pro-mock.yml
   - put: cf-pro-mock
     params:
       manifest: out/manifest-pro-mock.yml
       # overwrite "path" in manifest
-      path: gh-release
+      path: gh-pre-release
   - put: gh-release
     params:
-      name: gh-release/version
-      tag: gh-release/version
+      name: gh-pre-release/version
+      tag: gh-pre-release/version
       globs:
-      - gh-release/imakarahajimeru
-      - gh-release/manifest-pro-mock.yml
+      - gh-pre-release/imakarahajimeru
+      - gh-pre-release/manifest-pro-mock.yml
