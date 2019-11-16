@@ -9,10 +9,12 @@ image_resource:
 inputs:
   - name: repo
 outputs:
-  - name: repo
+  - name: binary
 
 run:
   dir: repo
   path: go
   args:
   - build
+  - -o
+  - ../binary/imakarahajimeru
