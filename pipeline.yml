@@ -1,9 +1,9 @@
-#resource_types:
-#- name: cappyzawa-cf
-#  type: registry-image
-#  source:
-#    repository: cappyzawa/cf-resource
-#    tag: 6.28.0
+resource_types:
+- name: cappyzawa-cf
+  type: registry-image
+  source:
+    repository: cappyzawa/cf-resource
+    tag: 6.28.0
 
 resources:
 - name: repo
@@ -38,7 +38,7 @@ resources:
     pre_release: true
     tag_filter: v*.*.*
 
-- name: cf
+- name: cf-stg-mock
   type: cappyzawa-cf
   icon: cloud
   source:
@@ -50,6 +50,17 @@ resources:
     skip_cert_check: true
 
 - name: cf-canary
+  type: cappyzawa-cf
+  icon: cloud
+  source:
+    api: ((cf-api))
+    username: ((cf-username))
+    password: ((cf-password))
+    organization: ((cf-org))
+    space: ((cf-space))
+    skip_cert_check: true
+
+- name: cf-pro-mock
   type: cappyzawa-cf
   icon: cloud
   source:
@@ -116,14 +127,15 @@ jobs:
         args:
         - -c
         - |
-          sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest.yml > out/manifest.yml
+          sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest-stg-mock.yml > out/manifest-stg-mock.yml
           sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest-canary.yml > out/manifest-canary.yml
+          sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest-pro-mock.yml > out/manifest-pro-mock.yml
   - task: build
     file: repo/build.yml
   - in_parallel:
-    - put: cf
+    - put: cf-stg-mock
       params:
-        manifest: out/manifest.yml
+        manifest: out/manifest-stg-mock.yml
         # overwrite "path" in manifest
         path: binary
     - put: cf-canary
@@ -139,20 +151,37 @@ jobs:
       tag_prefix: v
       globs:
       - binary/imakarahajimeru
-      - repo/manifest.yml
+      - repo/manifest-pro-mock.yml
+      - repo/manifest-stg-mock.yml
 
 - name: proMOCK-deploy
   plan:
   - get: gh-release
-    #- put: cf
-    #  params:
-    #    manifest: out/manifest.yml
-    #    # overwrite "path" in manifest
-    #    path: binary
+  - task: set-domain
+    config:
+      platform: linux
+      image_resource: {type: docker-image, source: {repository: alpine}}
+      inputs:
+      - name: gh-release
+      outputs:
+      - name: out
+      params:
+        DOMAIN: ((domain))
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          sed -e "s/<<FIX_ME>>/${DOMAIN}/g" repo/manifest-pro-mock.yml > out/manifest-pro-mock.yml
+  - put: cf-pro-mock
+    params:
+      manifest: out/manifest-pro-mock.yml
+      # overwrite "path" in manifest
+      path: gh-release
   - put: gh-release
     params:
       name: gh-release/version
       tag: gh-release/version
       globs:
       - gh-release/imakarahajimeru
-      - gh-release/manifest.yml
+      - gh-release/manifest-pro-mock.yml

@@ -1,0 +1,11 @@
+---
+applications:
+- name: imakara-pro
+  instances: 1
+  buildpack: binary_buildpack
+  routes:
+  - route: imakara-pro.<<FIX_ME>>
+  command: chmod +x ./imakarahajimeru && ./imakarahajimeru
+  env:
+    TZ: Asia/Tokyo
+    LANG: ja_JP.UTF-8
