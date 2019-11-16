@@ -8,8 +8,11 @@ image_resource:
 
 inputs:
   - name: repo
+outputs:
+  - name: repo
 
 run:
+  dir: repo
   path: go
   args:
   - build

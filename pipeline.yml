@@ -82,6 +82,6 @@ jobs:
     - get: version
       params: {bump: minor}
   - task: build
-    file: build.yml
+    file: repo/build.yml
   - put: version
     params: {file: imakarahajimeru}
