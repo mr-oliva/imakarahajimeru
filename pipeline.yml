@@ -37,7 +37,7 @@ resources:
   source:
     uri: https://github.com/bookun/imakarahajimeru
     driver: git
-    branch: mastei
+    branch: master
     file: imakarahajimeru
     username: bookun
     password: ((password))
@@ -48,7 +48,7 @@ jobs:
   plan:
   - in_parallel:
     - get: repo
-      trigger: true
+      #trigger: true
     - get: gh-release
       params:
         globs:
@@ -77,10 +77,11 @@ jobs:
 
 - name: version
   plan:
-  - get: version
-    params: {bump: minor}
+  - in_parallel:
+    - get: repo
+    - get: version
+      params: {bump: minor}
   - task: build
     file: build.yml
   - put: version
     params: {file: imakarahajimeru}
-

@@ -7,9 +7,9 @@ image_resource:
 
 
 inputs:
-  - name: version
+  - name: repo
 
 run:
   path: go
-  args: 
+  args:
   - build
