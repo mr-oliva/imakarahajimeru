@@ -186,8 +186,13 @@ jobs:
       - gh-pre-release/imakarahajimeru
       - gh-pre-release/manifest-pro-mock.yml
 
-- name: diff-check
+- name: diff-check-error
   plan:
   - get: repo
   - task: check
-    file: diff-error.yml
+    file: repo/diff-error.yml
+- name: diff-check-success
+  plan:
+  - get: repo
+  - task: check
+    file: repo/diff-success.yml
