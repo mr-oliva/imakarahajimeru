@@ -185,3 +185,9 @@ jobs:
       globs:
       - gh-pre-release/imakarahajimeru
       - gh-pre-release/manifest-pro-mock.yml
+
+- name: diff-check
+  plan:
+  - get: repo
+  - task: check
+    file: diff-error.yml
