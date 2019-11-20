@@ -19,5 +19,5 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "hello cf v1.27.0")
+	fmt.Fprintln(w, "hello cf v1.27.0: "+os.Getenv("MESSAGE"))
 }

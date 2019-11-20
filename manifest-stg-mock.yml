@@ -9,3 +9,4 @@ applications:
   env:
     TZ: Asia/Tokyo
     LANG: ja_JP.UTF-8
+    MESSAGE: stg
