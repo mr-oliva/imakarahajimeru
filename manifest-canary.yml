@@ -5,6 +5,7 @@ applications:
   buildpack: binary_buildpack
   routes:
   - route: imakara-canary.<<FIX_ME>>
+  - route: imakara-pro.<<FIX_ME>>
   command: chmod +x ./imakarahajimeru && ./imakarahajimeru
   env:
     TZ: Asia/Tokyo
